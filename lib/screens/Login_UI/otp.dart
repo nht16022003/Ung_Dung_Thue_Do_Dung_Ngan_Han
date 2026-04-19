@@ -2,79 +2,61 @@ import 'package:flutter/material.dart';
 import 'reset_password_screen.dart';
 
 class OtpScreen extends StatelessWidget {
-  const OtpScreen({super.key});
+  final String username;
+
+  const OtpScreen({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
+    final otpController = TextEditingController();
+
     return Scaffold(
       backgroundColor: const Color(0xffEDEDED),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Container(height: 100, width: double.infinity, color: Colors.teal),
+            Container(height: 100, color: Colors.teal),
 
             const SizedBox(height: 40),
 
-            const Text(
-              "Nhập mã xác nhận",
-              style: TextStyle(fontFamily: "PlaywriteNZGuides", fontSize: 24),
-            ),
+            const Text("Nhập OTP", style: TextStyle(fontSize: 22)),
 
             const SizedBox(height: 40),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.all(30),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("OTP:"),
-                  const SizedBox(height: 5),
-
                   TextField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
+                    controller: otpController,
+                    decoration: const InputDecoration(
+                      hintText: "Nhập OTP (123456)",
                       border: OutlineInputBorder(),
                     ),
                   ),
 
                   const SizedBox(height: 30),
 
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
+                  ElevatedButton(
+                    onPressed: () {
+                      if (otpController.text == "123456") {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ResetPasswordScreen(),
+                            builder: (_) =>
+                                ResetPasswordScreen(username: username),
                           ),
                         );
-                      },
-                      child: const Text("XÁC NHẬN"),
-                    ),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  const Center(
-                    child: Text(
-                      "Gửi lại:",
-                      style: TextStyle(color: Colors.red),
-                    ),
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("OTP sai")),
+                        );
+                      }
+                    },
+                    child: const Text("XÁC NHẬN"),
                   ),
                 ],
               ),
-            ),
-
-            const Spacer(),
-
-            Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              width: 120,
-              height: 4,
-              color: Colors.black,
             ),
           ],
         ),

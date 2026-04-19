@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import '../../widgets/Login/custom_button.dart';
 import '../../widgets/Login/custom_textfield.dart';
-import 'waychange_forget_password.dart';
-import 'otp.dart';
+import '../../services/auth_service.dart'; // 🔥 thêm
+import '../../screens/Login_UI/waychange_forget_password.dart';
+import 'otp.dart'; // 🔥 thêm
 
-class ForgotPasswordScreen extends StatelessWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +28,10 @@ class ForgotPasswordScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // 🔷 Header
             Container(height: 100, width: double.infinity, color: Colors.teal),
 
             const SizedBox(height: 40),
 
-            // 🔷 Title
             const Text(
               "Quên mật khẩu",
               style: TextStyle(fontFamily: "PlaywriteNZGuides", fontSize: 24),
@@ -27,7 +39,6 @@ class ForgotPasswordScreen extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // 🔷 Form
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
@@ -36,22 +47,55 @@ class ForgotPasswordScreen extends StatelessWidget {
                   const Text("Email:"),
                   const SizedBox(height: 5),
 
-                  const CustomTextField(hint: "Nhập email"),
+                  CustomTextField(
+                    hint: "Nhập email",
+                    controller: emailController,
+                  ),
 
                   const SizedBox(height: 30),
 
-                  // 🔷 Button
                   Center(
                     child: SizedBox(
                       width: 180,
                       height: 50,
                       child: CustomButton(
                         text: "GỬI YÊU CẦU",
-                        onPressed: () {
+                        onPressed: () async {
+                          String email = emailController.text.trim();
+
+                          if (email.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Vui lòng nhập email"),
+                              ),
+                            );
+                            return;
+                          }
+
+                          final users = await AuthService.getUsers();
+
+                          // 🔥 kiểm tra email tồn tại
+                          bool exists = users.any((u) => u.email == email);
+
+                          if (!exists) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Email không tồn tại"),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // 🔥 lấy username theo email
+                          String username = users
+                              .firstWhere((u) => u.email == email)
+                              .username;
+
+                          // 👉 chuyển OTP
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const OtpScreen(),
+                              builder: (_) => OtpScreen(username: username),
                             ),
                           );
                         },
@@ -61,13 +105,14 @@ class ForgotPasswordScreen extends StatelessWidget {
 
                   const SizedBox(height: 15),
 
+                  // 🔥 Cách khác (GIỮ NGUYÊN)
                   Center(
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ChooseMethodScreen(),
+                            builder: (_) => const ChooseMethodScreen(),
                           ),
                         );
                       },
@@ -86,12 +131,14 @@ class ForgotPasswordScreen extends StatelessWidget {
 
             const Spacer(),
 
-            // 🔷 Thanh dưới
             Container(
               margin: const EdgeInsets.only(bottom: 10),
               width: 120,
               height: 4,
-              color: Colors.black,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ],
         ),

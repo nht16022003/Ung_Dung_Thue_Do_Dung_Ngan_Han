@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ung_dung_thue_do_dung_ngan_han_nhom_10/screens/Product_UI/product_detail_screen.dart';
 import '../../models/product.dart';
 
 class ProductCard extends StatelessWidget {
@@ -10,7 +11,12 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // TODO: chuyển sang màn chi tiết
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(product: product),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -33,6 +39,10 @@ class ProductCard extends StatelessWidget {
                       product.image,
                       fit: BoxFit.cover,
                       width: double.infinity,
+                      gaplessPlayback: true,
+                      filterQuality: FilterQuality.low,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.broken_image),
                     ),
                   ),
 

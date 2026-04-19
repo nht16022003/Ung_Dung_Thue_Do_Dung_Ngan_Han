@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 import '../../widgets/Login/custom_button.dart';
 import '../../widgets/Login/custom_textfield.dart';
+import '../../services/auth_service.dart';
 import 'login_screen.dart';
 
-class ResetPasswordScreen extends StatelessWidget {
-  const ResetPasswordScreen({super.key});
+class ResetPasswordScreen extends StatefulWidget {
+  final String username;
+
+  const ResetPasswordScreen({super.key, required this.username});
+
+  @override
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+}
+
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  final passController = TextEditingController();
+  final confirmController = TextEditingController();
+
+  @override
+  void dispose() {
+    passController.dispose();
+    confirmController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,77 +31,71 @@ class ResetPasswordScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // 🔷 Header
-            Container(height: 100, width: double.infinity, color: Colors.teal),
+            Container(height: 100, color: Colors.teal),
 
             const SizedBox(height: 40),
 
-            // 🔷 Title
-            const Text(
-              "Quên mật khẩu",
-              style: TextStyle(fontFamily: "PlaywriteNZGuides", fontSize: 24),
-            ),
+            const Text("Đặt lại mật khẩu", style: TextStyle(fontSize: 22)),
 
             const SizedBox(height: 40),
 
-            // 🔷 Form
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.all(30),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Mật khẩu mới:"),
-                  const SizedBox(height: 5),
-
-                  const CustomTextField(
-                    hint: "Nhập mật khẩu mới",
+                  CustomTextField(
+                    hint: "Mật khẩu mới",
                     isPassword: true,
+                    controller: passController,
                   ),
 
                   const SizedBox(height: 20),
 
-                  const Text("Xác nhận mật khẩu mới:"),
-                  const SizedBox(height: 5),
-
-                  const CustomTextField(
-                    hint: "Nhập lại mật khẩu",
+                  CustomTextField(
+                    hint: "Xác nhận mật khẩu",
                     isPassword: true,
+                    controller: confirmController,
                   ),
 
                   const SizedBox(height: 30),
 
-                  // 🔷 Button
-                  Center(
-                    child: SizedBox(
-                      width: 180,
-                      height: 50,
-                      child: CustomButton(
-                        text: "XÁC NHẬN",
-                        onPressed: () {
-                          // 👉 quay về login sau khi đổi thành công
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginScreen(),
-                            ),
-                            (route) => false,
-                          );
-                        },
-                      ),
-                    ),
+                  CustomButton(
+                    text: "XÁC NHẬN",
+                    onPressed: () async {
+                      String pass = passController.text;
+                      String confirm = confirmController.text;
+
+                      if (pass != confirm) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Mật khẩu không khớp")),
+                        );
+                        return;
+                      }
+
+                      bool success = await AuthService.updatePassword(
+                        widget.username,
+                        pass,
+                      );
+
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Đổi mật khẩu thành công"),
+                          ),
+                        );
+
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
-            ),
-
-            const Spacer(),
-
-            // 🔷 Thanh dưới
-            Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              width: 120,
-              height: 4,
-              color: Colors.black,
             ),
           ],
         ),

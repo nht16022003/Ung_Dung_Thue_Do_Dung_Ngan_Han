@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:ung_dung_thue_do_dung_ngan_han_nhom_10/widgets/Login/custom_button.dart';
-import 'package:ung_dung_thue_do_dung_ngan_han_nhom_10/widgets/Login/custom_textfield.dart';
+import '../../widgets/Login/custom_button.dart';
+import '../../widgets/Login/custom_textfield.dart';
+import '../../services/auth_service.dart';
 import 'create_account_screen.dart';
-import 'forget_password.dart';
+import '../../screens/Login_UI/forget_password.dart'; // 🔥 thêm dòng này
 import '../TrangChu_UI/home_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +37,7 @@ class LoginScreen extends StatelessWidget {
             const SizedBox(height: 30),
 
             // 🔷 Title
-            Text(
+            const Text(
               "Đăng nhập vào hệ thống",
               style: TextStyle(fontFamily: "PlaywriteNZGuides", fontSize: 22),
             ),
@@ -37,18 +53,20 @@ class LoginScreen extends StatelessWidget {
                   const Text("Tên đăng nhập:"),
                   const SizedBox(height: 5),
 
-                  // 👉 DÙNG WIDGET
-                  const CustomTextField(hint: "Nhập username"),
+                  CustomTextField(
+                    hint: "Nhập username",
+                    controller: usernameController,
+                  ),
 
                   const SizedBox(height: 20),
 
                   const Text("Mật khẩu:"),
                   const SizedBox(height: 5),
 
-                  // 👉 DÙNG WIDGET
-                  const CustomTextField(
+                  CustomTextField(
                     hint: "Nhập mật khẩu",
                     isPassword: true,
+                    controller: passwordController,
                   ),
 
                   const SizedBox(height: 30),
@@ -60,14 +78,35 @@ class LoginScreen extends StatelessWidget {
                       height: 50,
                       child: CustomButton(
                         text: "ĐĂNG NHẬP",
-                        onPressed: () {
-                          // 👉 giả sử đăng nhập đúng
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomeScreen(),
-                            ),
-                          );
+                        onPressed: () async {
+                          String user = usernameController.text.trim();
+                          String pass = passwordController.text.trim();
+
+                          if (user.isEmpty || pass.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Vui lòng nhập đầy đủ"),
+                              ),
+                            );
+                            return;
+                          }
+
+                          bool success = await AuthService.login(user, pass);
+
+                          if (success) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const HomeScreen(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Sai tài khoản hoặc mật khẩu"),
+                              ),
+                            );
+                          }
                         },
                       ),
                     ),
@@ -75,16 +114,17 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // 🔷 Text dưới
+                  // 🔷 Text dưới (ĐÃ FIX)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // 🔴 Chưa có tài khoản
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const CreateAccountScreen(),
+                              builder: (_) => const CreateAccountScreen(),
                             ),
                           );
                         },
@@ -96,14 +136,16 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       const SizedBox(width: 10),
+
+                      // 🔥 QUÊN MẬT KHẨU (ĐÃ THÊM LẠI)
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const ForgotPasswordScreen(),
+                              builder: (_) => const ForgotPasswordScreen(),
                             ),
                           );
                         },
