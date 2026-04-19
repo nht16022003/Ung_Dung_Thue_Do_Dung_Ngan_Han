@@ -1,5 +1,12 @@
 import '../models/product.dart';
 
+//Category
+//Đồ gia dụng
+//Đồ sự kiện
+//Đồ du lịch dã ngoại
+//Thiết bị điện tử
+//Thời trang
+
 class ProductService {
   static List<Product> getProducts() {
     return [

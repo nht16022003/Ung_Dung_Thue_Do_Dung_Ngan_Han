@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ung_dung_thue_do_dung_ngan_han_nhom_10/screens/Orders/view_orders_screen.dart';
 import '../../services/product_service.dart';
 import '../../models/product.dart';
 import '../../widgets/home/home_search_bar.dart';
@@ -6,6 +7,8 @@ import '../../widgets/home/category_chip.dart';
 import '../../widgets/home/product_card.dart';
 import '../../services/category_service.dart';
 import '../../models/category.dart';
+import '../../screens/orders/view_orders_screen.dart' hide ViewOrdersScreen;
+import '../../screens/Information_UI/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,6 +30,47 @@ class HomeScreen extends StatelessWidget {
               accountName: Text("Xin chào 👋"),
               accountEmail: Text("user@gmail.com"),
             ),
+
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.teal),
+              title: const Text(
+                "Thông tin cá nhân",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Navigator.pop(context); // đóng drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(
+                Icons.receipt_long,
+                color: Colors.teal,
+              ), // Icon tờ biên lai
+              title: const Text(
+                "Đơn thuê của tôi",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Navigator.pop(context); // Tự động đóng cái menu trượt lại
+                Navigator.push(
+                  // Chuyển sang màn hình của mày
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ViewOrdersScreen(),
+                  ),
+                );
+              },
+            ),
+
+            // Thêm 1 cái đường gạch ngang cho nó tách biệt cho đẹp
+            const Divider(),
 
             ListTile(
               leading: const Icon(Icons.home),
